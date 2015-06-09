@@ -50,6 +50,7 @@ int *secuenciaRandom(int tamSecuencia, int randMax) {
 void AccesoCarpetas(DIR *dir) {
 
 	struct dirent *direntd;
+	struct stat statbuf;
 
 	 /* Leemos las entradas del direntd */
 	
@@ -73,9 +74,25 @@ void AccesoCarpetas(DIR *dir) {
 
 		DIR *dir2;
 
+		if (stat(texto, &statbuf) == ­-1) {
+
+		   fprintf(stderr, " No se pudo aplicar stat sobre el archivo %s: %s \n", texto, strerror(errno));
+		   exit(1);
+		}
+
+		if (statbuf.st_mode & S_IFDIR) {
+
+			printf("%s es un directorio\n", texto);
+		}
+
+		else {
+
+			printf("%s no es un directorio\n", texto);
+		}
+
 	if ( (dir2 = opendir(texto)) == NULL) {
 
-		perror(" opendir no se pudo realizar ya que dicho directorio no existe ");
+		perror(" No se puede abrir el directorio ya que no existe ");
 		exit(1);
 	}
 

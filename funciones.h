@@ -10,8 +10,8 @@
 /* Librerías utilizadas */
 #include <errno.h>
 #include <unistd.h>
-#include <math.h>
 #include <stdio.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <dirent.h>
 #include <errno.h>
@@ -21,12 +21,10 @@
 #include <time.h>
 #include <assert.h>
 
-
 /* Constantes */
 #define TAM   80 /* */
 #define MAX_N 10 /* Valor máximo para el rango del número aleatorio n */
 #define MAX_M 20 /* Valor máximo para el rango del número aleatorio m */
-
 
 /* Funciones */
 
