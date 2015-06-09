@@ -1,2 +1,2 @@
-# Vie
-Je m'apelle Yubirisnaidys :)
+# SistemasOperativos
+Proyectos SO
