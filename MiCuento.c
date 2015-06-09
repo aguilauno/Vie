@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
 			/* Cuando se colocan todos los parámetros completos */
 			i = 2;
 			if ((dir = opendir(argv[i++])) == NULL) {
-				perror("opendir no se pudo realizar");
+				perror(" No se puede abrir el directorio ya que no existe ");
 				exit(1);
 			}
 		}
@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
 			/* Cuando no se coloca el directorio, se toma el directorio actual por default */
 			i = 1;
 			if ((dir = opendir(".")) == NULL) {
-				error(" No se puede abrir el directorio ");
+				error(" No se puede abrir el directorio ya que no existe ");
 				exit(1);
 			}
 		}
@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
 
 	else if (argc > 6 || argc < 4) { /* Cuando no se indican los parámetros necesarios */
 
-		printf("Error, no se indican los parámetros necesarios.\n");
+		printf(" Error, no se indican los parámetros necesarios. \n");
     	exit(1);
 	}
 
