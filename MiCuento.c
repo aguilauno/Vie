@@ -12,8 +12,12 @@
 
 int main(int argc, char *argv[]) {
 
+	/* Inicializamos el pipe */
+	int fd[2];
+	pipe(fd);
+
 	char *salida, *cadena;
-	int i, n, m;
+	int i, n, m, j, status;
 
 	DIR *dir;
 
@@ -55,10 +59,9 @@ int main(int argc, char *argv[]) {
 		}
 
 		int *arregloDirectorios;
-		int *arregloTextos;
 		
 		arregloDirectorios = secuenciaRandom(n, MAX_N);
-		arregloTextos      = secuenciaRandom(m, MAX_M);
+		
 
 		/* Prueba de manejo de apuntadores de arreglos */
 		// int j;
@@ -73,12 +76,37 @@ int main(int argc, char *argv[]) {
 		/* Crear n procesos hijos y cada uno toma control
 		 * de la carpeta que le tocó aleatoriamente */
 
-		/* Luego cada proceso hijo genera m números aleatorios [1..20] para
-		 * seleccionar de sus textos cuales va a usar en el cuento */
+		/* Arreglo de procesos hijos */  
+  		pid_t hijos[n];
 
-		AccesoCarpetas(dir);
-		salida = strdup(argv[i]);
-		closedir(dir);		
+  		/* Ciclo generador de los procesos hijos */
+  		for (j = 0; j < n; ++j) {
+	
+			hijos[j]=fork();
+
+			if (hijos[j] == -1) {
+			  printf("Hubo un error al crear un hijo, el programa se detendra\n");
+			  exit(-1);
+			}
+
+		    if (hijos[j] == 0) {
+				/* Luego cada proceso hijo genera m números aleatorios [1..20] para
+				 * seleccionar de sus textos cuales va a usar en el cuento */
+		    	int *arregloTextos;
+		    	arregloTextos = secuenciaRandom(m, MAX_M);
+
+				AccesoCarpetas(dir);
+				salida = strdup(argv[i]);
+				closedir(dir);
+			}
+  		}
+
+  		/* Ciclo que espera por los procesos hijos */
+		for (j = 0; j < n; ++j) {
+			waitpid(hijos[j], &status, 0);
+			status = WEXITSTATUS(status);
+		}
+
 	}
 
 	else if (argc > 6 || argc < 4) { /* Cuando no se indican los parámetros necesarios */
