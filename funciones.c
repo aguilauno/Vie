@@ -7,7 +7,7 @@
  *  		Meggie Sanchez  # Carnet 11-10939
  */
 
- #include "funciones.h"
+#include "funciones.h"
 
 /* Comparador de enteros */
 int cmpfunc(const void *a, const void *b) {
@@ -58,7 +58,6 @@ void AccesoCarpetas(DIR *dir) {
 	// 	printf("%d\t%d\t%d\t%s\n", direntd->d_ino, direntd->d_off, direntd->d_reclen, direntd->d_name);
 	// }
 	
-	direntd = readdir(dir);
 	int array[] = {1, 3, 5, 8};
 	int i;
 	int n = 4;
@@ -74,20 +73,20 @@ void AccesoCarpetas(DIR *dir) {
 
 		DIR *dir2;
 
-		if (stat(texto, &statbuf) == ­-1) {
+		if (stat(dir, &statbuf) == ­-1) {
 
-		   fprintf(stderr, " No se pudo aplicar stat sobre el archivo %s: %s \n", texto, strerror(errno));
+		   fprintf(stderr, " No se pudo aplicar stat sobre el archivo %s: %s \n", dir, strerror(errno));
 		   exit(1);
 		}
 
 		if (statbuf.st_mode & S_IFDIR) {
 
-			printf("%s es un directorio\n", texto);
+			printf("%s es un directorio\n", dir);
 		}
 
 		else {
 
-			printf("%s no es un directorio\n", texto);
+			printf("%s no es un directorio\n", dir);
 		}
 
 	if ( (dir2 = opendir(texto)) == NULL) {
