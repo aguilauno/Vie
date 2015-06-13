@@ -33,4 +33,6 @@ int cmpfunc(const void *a, const void *b);
 /* Genera el apuntador a un arreglo de números aleatorios */
 int *secuenciaRandom(int tamSecuencia, int randMax);
 /* */
-void AccesoCarpetas(DIR *dir, int n, int m, int *arregloDirectorios, int argc, char *cadena);
+void AccesoCarpetas(DIR *dir, int n, int m, int *arregloDirectorios, int *arregloTextos, int argc, char *cadena);
+/* */
+void AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre, char *slash);

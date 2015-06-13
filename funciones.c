@@ -47,31 +47,29 @@ int *secuenciaRandom(int tamSecuencia, int randMax) {
     return arreglo;
 }
 
-void AccesoCarpetas(DIR *dir, int n, int m, int *arregloDirectorios, int argc, char *cadena) {
+void AccesoCarpetas(DIR *dir, int n, int m, int *arregloDirectorios, int *arregloTextos, int argc, char *cadena) {
 
 	struct stat buffer; 		//Buffer con la informacion de la entrada
 	struct dirent *direntd;
 	struct dirent *direntd2;
 	direntd = readdir(dir);
-	int i,j, tam;
-	int rpta;
+	int i,j, tam, rpta;
 	tam = (unsigned) strlen(dir);
 
 	for (i = 0; i < n; i++) {
-		rpta = *(arregloDirectorios + i);
-		//printf("%d", rpta);
 
-		char *texto, *direntdName, *slash, *nombre, *directorioPrin;
+		rpta = *(arregloDirectorios + i);
+
+		char *texto, *slash, *nombre, *directorioPrin;
 		DIR *dir2;
 
 		texto = (char *)malloc(sizeof(char)*TAM);
-		//direntdName = (char *)malloc(sizeof(char)*TAM);
 		slash = (char *)malloc(sizeof(char)*TAM);
 		nombre = (char *)malloc(sizeof(char)*TAM);
 		directorioPrin = (char *)malloc(sizeof(char)*tam);
 
+		slash = "/";
 		sprintf(texto, "%d", rpta);
-		//printf("%s", texto);
 
 		/* Leemos las entradas del direntd */
 
@@ -79,34 +77,30 @@ void AccesoCarpetas(DIR *dir, int n, int m, int *arregloDirectorios, int argc, c
 	 	//   		printf("%d\t%d\t%d\t%s\n", direntd->d_ino, direntd->d_off, direntd->d_reclen, direntd->d_name);
 	 	//  	}
 
-		//direntdName = texto;
-		//printf("%s", direntd->d_name);
-		slash = "/";
-		//printf(direntdName);
-
 		if (argc == 6) {
 			directorioPrin = cadena;
 			strcpy(nombre, directorioPrin);
 			strcat(nombre, texto);
-			strcat(nombre,"\0");
-			printf(nombre);			
+			//printf(nombre);	
 		}
 		else if (argc == 4) {
 			getcwd(directorioPrin, TAM);
 			strcpy(nombre, directorioPrin);
 			strcat(nombre, slash);
 			strcat(nombre, texto);
-			strcat(nombre,"\0");
-			printf(nombre);	
+			//printf(nombre);
 		}
 
 		j = 0;
 		j = stat(nombre, &buffer);
 
 		if (j != 0) {
-			printf( "no se pudo obtener la informacion de %s\n", nombre);
-			perror("El error fue el siguiente ");
+			printf(" No se pudo obtener la informacion de la carpeta %s\n", nombre);
+			perror(" El error fue el siguiente ");
 	    	exit(-1);	
+		}
+		else if (S_ISDIR(buffer.st_mode)) {
+			//printf(" Es un directorio ");
 		}
 
 	if ( (dir2 = opendir(texto)) == NULL) {
@@ -115,21 +109,59 @@ void AccesoCarpetas(DIR *dir, int n, int m, int *arregloDirectorios, int argc, c
 		exit(1);
 	}
 	else {
-		printf(" El directorio actual es %s\n", texto);
-		direntd2 = readdir(dir2);
+		//printf(" El directorio actual es %s\n", texto);
 	}
 
 	 /* Leemos las entradas del direntd */
 	
-		// while ( (direntd = readdir(dir2) ) != NULL) {
-		//  	printf("%d\t%d\t%d\t%s\n", direntd->d_ino, direntd->d_off, direntd->d_reclen, direntd->d_name);
-		// }
+	direntd2 = readdir(dir2);
 
-	closedir(dir2);
-
-	// free(slash);
-	// free(nombre);
-	// free(texto);
-	// free(direntdName);
+	// while ( (direntd2 = readdir(dir2) ) != NULL) {
+	//  	printf("%d\t%d\t%d\t%s\n", direntd2->d_ino, direntd2->d_off, direntd2->d_reclen, direntd2->d_name);
+	// }
+	AccesoArchivos(dir2, m, arregloTextos, nombre, slash);
+	free(directorioPrin);
+	free(texto);
 	}
+}
+
+void AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre, char *slash) {
+
+	int i,j,rpta,tam2;
+	struct stat buffer2; 		//Buffer con la informacion de la entrada
+	char *texto, directorioActual;
+	tam2 = (unsigned) strlen(dir2);
+
+	texto = (char *)malloc(sizeof(char)*TAM);
+	directorioActual = (char *)malloc(sizeof(char)*tam2);
+
+	for (i = 0; i < m; i++) {
+
+		rpta = *(arregloTextos + i);
+
+		sprintf(texto, "%d", rpta);
+
+		directorioActual = nombre;
+		strcat(directorioActual, slash);
+		strcat(directorioActual, texto);
+		strcat(directorioActual,"\0");
+		printf(directorioActual);
+
+		if (stat(directorioActual, &buffer2) != 0) {
+			printf(" No se pudo obtener la informacion del archivo %s\n", directorioActual);
+			perror(" El error fue el siguiente ");
+			exit(-1);	
+		}
+
+		else if (S_ISREG(buffer2.st_mode)) {
+			printf(" Es un archivo regular ");
+		}
+
+	}
+
+	free(texto);
+	free(directorioActual);
+	free(slash);
+	free(nombre);
+	closedir(dir2);
 }

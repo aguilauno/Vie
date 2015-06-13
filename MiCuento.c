@@ -77,8 +77,7 @@ int main(int argc, char *argv[]) {
 		/* Luego cada proceso hijo genera m números aleatorios [1..20] para
 		 * seleccionar de sus textos cuales va a usar en el cuento */
 
-
-		AccesoCarpetas(dir, n, m, arregloDirectorios, argc, cadena);
+		AccesoCarpetas(dir, n, m, arregloDirectorios, arregloTextos, argc, cadena);
 		salida = strdup(argv[i]);
 		closedir(dir);		
 	}
