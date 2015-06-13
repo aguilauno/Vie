@@ -47,64 +47,89 @@ int *secuenciaRandom(int tamSecuencia, int randMax) {
     return arreglo;
 }
 
-void AccesoCarpetas(DIR *dir) {
+void AccesoCarpetas(DIR *dir, int n, int m, int *arregloDirectorios, int argc, char *cadena) {
 
+	struct stat buffer; 		//Buffer con la informacion de la entrada
 	struct dirent *direntd;
-	struct stat statbuf;
+	struct dirent *direntd2;
+	direntd = readdir(dir);
+	int i,j, tam;
+	int rpta;
+	tam = (unsigned) strlen(dir);
 
-	 /* Leemos las entradas del direntd */
-	
-	// while ( (direntd = readdir(dir) ) != NULL) {
-	// 	printf("%d\t%d\t%d\t%s\n", direntd->d_ino, direntd->d_off, direntd->d_reclen, direntd->d_name);
-	// }
-	
-	int array[] = {1, 3, 5, 8};
-	int i;
-	int n = 4;
+	for (i = 0; i < n; i++) {
+		rpta = *(arregloDirectorios + i);
+		//printf("%d", rpta);
 
-	for (i = 1; i <= n; i++) {
-
-		char *texto;
-
-		texto = (char *)malloc(sizeof(char)*TAM);
-
-		sprintf(texto, "%d", i);
-		direntd = readdir(dir);
-
+		char *texto, *direntdName, *slash, *nombre, *directorioPrin;
 		DIR *dir2;
 
-		if (stat(dir, &statbuf) == ­-1) {
+		texto = (char *)malloc(sizeof(char)*TAM);
+		//direntdName = (char *)malloc(sizeof(char)*TAM);
+		slash = (char *)malloc(sizeof(char)*TAM);
+		nombre = (char *)malloc(sizeof(char)*TAM);
+		directorioPrin = (char *)malloc(sizeof(char)*tam);
 
-		   fprintf(stderr, " No se pudo aplicar stat sobre el archivo %s: %s \n", dir, strerror(errno));
-		   exit(1);
+		sprintf(texto, "%d", rpta);
+		//printf("%s", texto);
+
+		/* Leemos las entradas del direntd */
+
+		// while ( (direntd = readdir(dir) ) != NULL) {
+	 	//   		printf("%d\t%d\t%d\t%s\n", direntd->d_ino, direntd->d_off, direntd->d_reclen, direntd->d_name);
+	 	//  	}
+
+		//direntdName = texto;
+		//printf("%s", direntd->d_name);
+		slash = "/";
+		//printf(direntdName);
+
+		if (argc == 6) {
+			directorioPrin = cadena;
+			strcpy(nombre, directorioPrin);
+			strcat(nombre, texto);
+			strcat(nombre,"\0");
+			printf(nombre);			
+		}
+		else if (argc == 4) {
+			getcwd(directorioPrin, TAM);
+			strcpy(nombre, directorioPrin);
+			strcat(nombre, slash);
+			strcat(nombre, texto);
+			strcat(nombre,"\0");
+			printf(nombre);	
 		}
 
-		if (statbuf.st_mode & S_IFDIR) {
+		j = 0;
+		j = stat(nombre, &buffer);
 
-			printf("%s es un directorio\n", dir);
-		}
-
-		else {
-
-			printf("%s no es un directorio\n", dir);
+		if (j != 0) {
+			printf( "no se pudo obtener la informacion de %s\n", nombre);
+			perror("El error fue el siguiente ");
+	    	exit(-1);	
 		}
 
 	if ( (dir2 = opendir(texto)) == NULL) {
 
-		perror(" No se puede abrir el directorio ya que no existe ");
+		perror(" No se puede abrir el directorio ya que no existe 3");
 		exit(1);
 	}
-
-	dir2 = opendir(texto);
-
-	printf("El directorio actual es %s\n", texto);
+	else {
+		printf(" El directorio actual es %s\n", texto);
+		direntd2 = readdir(dir2);
+	}
 
 	 /* Leemos las entradas del direntd */
 	
-		while ( (direntd = readdir(dir2) ) != NULL) {
-		 	printf("%d\t%d\t%d\t%s\n", direntd->d_ino, direntd->d_off, direntd->d_reclen, direntd->d_name);
-		}
+		// while ( (direntd = readdir(dir2) ) != NULL) {
+		//  	printf("%d\t%d\t%d\t%s\n", direntd->d_ino, direntd->d_off, direntd->d_reclen, direntd->d_name);
+		// }
 
-		closedir(dir2);
+	closedir(dir2);
+
+	// free(slash);
+	// free(nombre);
+	// free(texto);
+	// free(direntdName);
 	}
 }
