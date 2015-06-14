@@ -15,12 +15,17 @@ int main(int argc, char *argv[]) {
 	char *salida, *cadena;
 	int i, n, m;
 
-	DIR *dir;
+	DIR *dir; /* Directorio principal a abrir */
 
-	cadena = (char *)malloc(sizeof(char)*TAM);
-	salida = (char *)malloc(sizeof(char)*TAM);
+	cadena = (char *)malloc(sizeof(char)*TAM); /* Donde se guardara el 
+												  directorio a abrir que se 
+												  indica en la ejecución */
+	salida = (char *)malloc(sizeof(char)*TAM); /* Donde se guardara el archivo 
+												  con la escritura de todos los
+												  archivos que han tomado los 
+												  hijos */
 
-	if ((argc == 6) || (argc == 4)) { 
+	if ((argc == 6) || (argc == 4)) { /* Verificación de parámetros */
 		
 		if (argc == 6) {
 			/* Cuando se colocan todos los parámetros completos */
@@ -41,7 +46,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-		n = atoi(argv[i++]); /* Valor n que el padre debe considerar */
+		n = atoi(argv[i++]); /* Valor n que el padre debe considerar para saber sus hijos */
 
 		if ((n > 10) || (n < 1)) {
 			printf(" El parámetro n debe estar entre 1 y 10 \n");
@@ -55,8 +60,10 @@ int main(int argc, char *argv[]) {
 			exit(1);
 		}
 
-		int *arregloDirectorios;
-		int *arregloTextos;
+		int *arregloDirectorios; /* Arreglo de cantidad n para números 
+									aleatorios para el acceso a carpetas */
+		int *arregloTextos;		 /* Arreglo de cantidad m para números 
+									aleatorios para el acceso a archivos */
 		
 		arregloDirectorios = secuenciaRandom(n, MAX_N);
 		arregloTextos      = secuenciaRandom(m, MAX_M);

@@ -9,11 +9,22 @@
 
 #include "funciones.h"
 
-/* Comparador de enteros */
+/* cmpfunc
+* Comparador de enteros.
+* a: apuntador de un número entero
+* b: apuntador de un número entero
+* retorna la resta de ambos números
+*/ 
 int cmpfunc(const void *a, const void *b) {
 	return (*(int*)a - *(int*)b);
 }
 
+/* secuenciaRandom
+* Crea un arreglo con numeros aleatorios que están ordenados.
+* tamSecuencia: tamaño del arreglo
+* randMax: número máximo posible que se puede obtener del random
+* retorna el arreglo ordenado de menor a mayor
+*/ 
 int *secuenciaRandom(int tamSecuencia, int randMax) {
 	/* Utilizando el algoritmo Floyd para evitar números repetidos */
 	unsigned char utilizado[randMax];
@@ -47,6 +58,17 @@ int *secuenciaRandom(int tamSecuencia, int randMax) {
     return arreglo;
 }
 
+/* AccesoCarpetas
+* Accede a las carpetas correspondientes para hacer la verificación de si son 
+* directorios o no.
+* dir: directorio en el que se hará acceso para lectura de carpetas y archivos
+* n: cantidad de elementos a recorrer en el arregloDirectorios
+* m: cantidad de elementos a recorrer en el arregloTextos
+* arregloDirectorios: arreglo que contiene cada uno de los números que 
+* representan las carpetas a los que accesará cada uno de los procesos hijos
+* arregloTextos: arreglo que contiene cada uno de los números que representan 
+* los archivos a los que accesará cada uno de los procesos hijos
+*/ 
 void AccesoCarpetas(DIR *dir, int n, int m, int *arregloDirectorios, int *arregloTextos, int argc, char *cadena) {
 
 	struct stat buffer; 		//Buffer con la informacion de la entrada

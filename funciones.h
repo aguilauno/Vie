@@ -22,7 +22,7 @@
 #include <assert.h>
 
 /* Constantes */
-#define TAM   200 /* */
+#define TAM   200 /* Valor arbitrario para definir un tamaño para strings */
 #define MAX_N 10 /* Valor máximo para el rango del número aleatorio n */
 #define MAX_M 20 /* Valor máximo para el rango del número aleatorio m */
 
@@ -32,7 +32,7 @@
 int cmpfunc(const void *a, const void *b);
 /* Genera el apuntador a un arreglo de números aleatorios */
 int *secuenciaRandom(int tamSecuencia, int randMax);
-/* */
+/* Procedimiento para acceder a las carpetas necesarias */
 void AccesoCarpetas(DIR *dir, int n, int m, int *arregloDirectorios, int *arregloTextos, int argc, char *cadena);
 /* */
 void AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre, char *slash);
