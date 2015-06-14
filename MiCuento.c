@@ -30,16 +30,17 @@ int main(int argc, char *argv[]) {
 			/* Cuando se colocan todos los parámetros completos */
 			i = 2;
 			if ((dir = opendir(argv[i++])) == NULL) {
-				perror("opendir no se pudo realizar");
+				perror(" No se puede abrir el directorio ya que no existe 1");
 				exit(1);
 			}
+			cadena = argv[2];
 		}
 
 		else if (argc == 4) { 
 			/* Cuando no se coloca el directorio, se toma el directorio actual por default */
 			i = 1;
 			if ((dir = opendir(".")) == NULL) {
-				error(" No se puede abrir el directorio ");
+				error(" No se puede abrir el directorio ya que no existe 2");
 				exit(1);
 			}
 		}
@@ -64,14 +65,14 @@ int main(int argc, char *argv[]) {
 		
 
 		/* Prueba de manejo de apuntadores de arreglos */
-		// int j;
-		// printf("\n\n");
-		// for (j = 0; j < n; ++j)
-		// 	printf("%d ", *(arregloDirectorios + j));
-		// printf("\n");
-		// for (j = 0; j < m; ++j)
-		// 	printf("%d ", *(arregloTextos + j));
-		// printf("\n\n\n");
+		 // int j;
+		 // printf("\n\n");
+		 // for (j = 0; j < n; ++j)
+		 // 	printf("%d ", *(arregloDirectorios + j));
+		 // printf("\n");
+		 // for (j = 0; j < m; ++j)
+		 // 	printf("%d ", *(arregloTextos + j));
+		 // printf("\n\n\n");
 
 		/* Crear n procesos hijos y cada uno toma control
 		 * de la carpeta que le tocó aleatoriamente */
@@ -95,23 +96,24 @@ int main(int argc, char *argv[]) {
 		    	int *arregloTextos;
 		    	arregloTextos = secuenciaRandom(m, MAX_M);
 
-				AccesoCarpetas(dir);
+		    	AccesoCarpetas(dir, n, m, arregloDirectorios, arregloTextos, argc, cadena);
 				salida = strdup(argv[i]);
 				closedir(dir);
+
 			}
   		}
 
   		/* Ciclo que espera por los procesos hijos */
 		for (j = 0; j < n; ++j) {
 			waitpid(hijos[j], &status, 0);
-			status = WEXITSTATUS(status);
-		}
+			status = WEXITSTATUS(status);		
+		}		
 
 	}
 
 	else if (argc > 6 || argc < 4) { /* Cuando no se indican los parámetros necesarios */
 
-		printf("Error, no se indican los parámetros necesarios.\n");
+		printf(" Error, no se indican los parámetros necesarios. \n");
     	exit(1);
 	}
 

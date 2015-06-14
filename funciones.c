@@ -7,7 +7,7 @@
  *  		Meggie Sanchez  # Carnet 11-10939
  */
 
- #include "funciones.h"
+#include "funciones.h"
 
 /* Comparador de enteros */
 int cmpfunc(const void *a, const void *b) {
@@ -47,48 +47,121 @@ int *secuenciaRandom(int tamSecuencia, int randMax) {
     return arreglo;
 }
 
-void AccesoCarpetas(DIR *dir) {
+void AccesoCarpetas(DIR *dir, int n, int m, int *arregloDirectorios, int *arregloTextos, int argc, char *cadena) {
 
+	struct stat buffer; 		//Buffer con la informacion de la entrada
 	struct dirent *direntd;
-
-	 /* Leemos las entradas del direntd */
-	
-	// while ( (direntd = readdir(dir) ) != NULL) {
-	// 	printf("%d\t%d\t%d\t%s\n", direntd->d_ino, direntd->d_off, direntd->d_reclen, direntd->d_name);
-	// }
-	
+	struct dirent *direntd2;
 	direntd = readdir(dir);
-	int array[] = {1, 3, 5, 8};
-	int i;
-	int n = 4;
+	int i,j, tam, rpta;
+	tam = (unsigned) strlen(dir);
 
-	for (i = 1; i <= n; i++) {
+	for (i = 0; i < n; i++) {
 
-		char *texto;
+		rpta = *(arregloDirectorios + i);
+
+		char *texto, *slash, *nombre, *directorioPrin;
+		DIR *dir2;
 
 		texto = (char *)malloc(sizeof(char)*TAM);
+		slash = (char *)malloc(sizeof(char)*TAM);
+		nombre = (char *)malloc(sizeof(char)*TAM);
+		directorioPrin = (char *)malloc(sizeof(char)*tam);
 
-		sprintf(texto, "%d", i);
-		direntd = readdir(dir);
+		slash = "/";
+		sprintf(texto, "%d", rpta);
 
-		DIR *dir2;
+		/* Leemos las entradas del direntd */
+
+		// while ( (direntd = readdir(dir) ) != NULL) {
+	 	//   		printf("%d\t%d\t%d\t%s\n", direntd->d_ino, direntd->d_off, direntd->d_reclen, direntd->d_name);
+	 	//  	}
+
+		if (argc == 6) {
+			directorioPrin = cadena;
+			strcpy(nombre, directorioPrin);
+			strcat(nombre, texto);
+			//printf(nombre);	
+		}
+		else if (argc == 4) {
+			getcwd(directorioPrin, TAM);
+			strcpy(nombre, directorioPrin);
+			strcat(nombre, slash);
+			strcat(nombre, texto);
+			//printf(nombre);
+		}
+
+		j = 0;
+		j = stat(nombre, &buffer);
+
+		if (j != 0) {
+			printf(" No se pudo obtener la informacion de la carpeta %s\n", nombre);
+			perror(" El error fue el siguiente ");
+	    	exit(-1);	
+		}
+		else if (S_ISDIR(buffer.st_mode)) {
+			//printf(" Es un directorio ");
+		}
 
 	if ( (dir2 = opendir(texto)) == NULL) {
 
-		perror(" opendir no se pudo realizar ya que dicho directorio no existe ");
+		perror(" No se puede abrir el directorio ya que no existe 3");
 		exit(1);
 	}
-
-	dir2 = opendir(texto);
-
-	printf("El directorio actual es %s\n", texto);
+	else {
+		//printf(" El directorio actual es %s\n", texto);
+	}
 
 	 /* Leemos las entradas del direntd */
 	
-		while ( (direntd = readdir(dir2) ) != NULL) {
-		 	printf("%d\t%d\t%d\t%s\n", direntd->d_ino, direntd->d_off, direntd->d_reclen, direntd->d_name);
+	direntd2 = readdir(dir2);
+
+	// while ( (direntd2 = readdir(dir2) ) != NULL) {
+	//  	printf("%d\t%d\t%d\t%s\n", direntd2->d_ino, direntd2->d_off, direntd2->d_reclen, direntd2->d_name);
+	// }
+	AccesoArchivos(dir2, m, arregloTextos, nombre, slash);
+	free(directorioPrin);
+	free(texto);
+	}
+}
+
+void AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre, char *slash) {
+
+	int i,j,rpta,tam2;
+	struct stat buffer2; 		//Buffer con la informacion de la entrada
+	char *texto, directorioActual;
+	tam2 = (unsigned) strlen(dir2);
+
+	texto = (char *)malloc(sizeof(char)*TAM);
+	directorioActual = (char *)malloc(sizeof(char)*tam2);
+
+	for (i = 0; i < m; i++) {
+
+		rpta = *(arregloTextos + i);
+
+		sprintf(texto, "%d", rpta);
+
+		directorioActual = nombre;
+		strcat(directorioActual, slash);
+		strcat(directorioActual, texto);
+		strcat(directorioActual,"\0");
+		printf(directorioActual);
+
+		if (stat(directorioActual, &buffer2) != 0) {
+			printf(" No se pudo obtener la informacion del archivo %s\n", directorioActual);
+			perror(" El error fue el siguiente ");
+			exit(-1);	
 		}
 
-		closedir(dir2);
+		else if (S_ISREG(buffer2.st_mode)) {
+			printf(" Es un archivo regular ");
+		}
+
 	}
+
+	free(texto);
+	free(directorioActual);
+	free(slash);
+	free(nombre);
+	closedir(dir2);
 }
