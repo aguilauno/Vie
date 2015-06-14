@@ -109,12 +109,11 @@ void AccesoCarpetas(DIR *dir, int n, int m, int j, int *arregloDirectorios, int 
 		//printf(" El directorio actual es %s\n", texto);
 	}
 
-
 	direntd2 = readdir(dir2);
 
 	printf("Antes de AccesoArchivos\n");
-	getFullName(nombre, direntd2);
-	//AccesoArchivos(dir2, m, arregloTextos, nombre, slash);
+	//getFullName(nombre, direntd2);
+	AccesoArchivos(dir2, m, arregloTextos, nombre, slash);
 	printf("Despues de AccesoArchivos\n");
 
 	free(directorioPrin);
@@ -123,21 +122,6 @@ void AccesoCarpetas(DIR *dir, int n, int m, int j, int *arregloDirectorios, int 
 	free(slash);
 	closedir(dir2);
 
-}
-
-char *getFullName(char *ruta, struct dirent *ent)
-{
-  char *nombrecompleto;
-  int tmp;
-
-  tmp=strlen(ruta);
-  nombrecompleto=malloc(tmp+strlen(ent->d_name)+2); /* Sumamos 2, por el \0 y la barra de directorios (/) no sabemos si falta */
-  if (ruta[tmp-1]=='/')
-    sprintf(nombrecompleto,"%s%s", ruta, ent->d_name);
-  else
-    sprintf(nombrecompleto,"%s/%s", ruta, ent->d_name);
-  
-  return nombrecompleto;
 }
 
 void AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre, char *slash) {

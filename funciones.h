@@ -36,6 +36,3 @@ int *secuenciaRandom(int tamSecuencia, int randMax);
 void AccesoCarpetas(DIR *dir, int n, int m, int j, int *arregloDirectorios, int *arregloTextos, int argc, char *cadena);
 /* */
 void AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre, char *slash);
-
-/* Obtiene el nombre del fichero con la ruta completa */
-char *getFullName(char *ruta, struct dirent *ent);
