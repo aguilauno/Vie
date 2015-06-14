@@ -59,6 +59,8 @@ int main(int argc, char *argv[]) {
 			exit(1);
 		}
 
+		salida = strdup(argv[i]); /* Obtenemos el archivo de salida */
+
 		int *arregloDirectorios;
 		
 		arregloDirectorios = secuenciaRandom(n, MAX_N);
@@ -82,10 +84,8 @@ int main(int argc, char *argv[]) {
 
   		/* Ciclo generador de los procesos hijos */
   		for (j = 0; j < n; ++j) {
-	
-			hijos[j]=fork();
 
-			if (hijos[j] == -1) {
+			if ((hijos[j] = fork()) == -1) {
 			  printf("Hubo un error al crear un hijo, el programa se detendra\n");
 			  exit(-1);
 			}
@@ -95,12 +95,14 @@ int main(int argc, char *argv[]) {
 				 * seleccionar de sus textos cuales va a usar en el cuento */
 		    	int *arregloTextos;
 		    	arregloTextos = secuenciaRandom(m, MAX_M);
+		    	//printf("Soy el hijo con pid %d, iteracion:%d\n", getpid(), j);
 
-		    	AccesoCarpetas(dir, n, m, arregloDirectorios, arregloTextos, argc, cadena);
-				salida = strdup(argv[i]);
-				closedir(dir);
-
+		    	AccesoCarpetas(dir, n, m, j, arregloDirectorios, arregloTextos, argc, cadena);
+		    	exit(0);
 			}
+			// else {
+			// 	printf("Soy el Padre con ID= %ld, mi hijo es %ld\n",(long)getpid(),hijos[j]);
+			// }
   		}
 
   		/* Ciclo que espera por los procesos hijos */
@@ -116,6 +118,8 @@ int main(int argc, char *argv[]) {
 		printf(" Error, no se indican los parámetros necesarios. \n");
     	exit(1);
 	}
+
+	closedir(dir);
 
 	return 0;
 } 
