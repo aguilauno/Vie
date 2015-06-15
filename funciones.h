@@ -36,3 +36,11 @@ int *secuenciaRandom(int tamSecuencia, int randMax);
 void AccesoCarpetas(DIR *dir, int n, int m, int j, int *arregloDirectorios, int *arregloTextos, int argc, char *cadena);
 /* */
 void AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre);
+/* */
+void LeerPipes(int *pipe);
+/* */
+void EscribirPipes(int *pipe);
+/* */
+char *LeerArchivo(char *directorioActual, char *buffer);
+/* */
+void EscribirArchivo(char *salida);

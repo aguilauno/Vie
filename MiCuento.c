@@ -12,10 +12,6 @@
 
 int main(int argc, char *argv[]) {
 
-	/* Inicializamos el pipe */
-	int fd[2];
-	pipe(fd);
-
 	char *salida, *cadena;
 	int i, n, m, j, status;
 
@@ -79,11 +75,20 @@ int main(int argc, char *argv[]) {
 		/* Crear n procesos hijos y cada uno toma control
 		 * de la carpeta que le tocó aleatoriamente */
 
+		/* Inicializamos el pipe */
+		int fd[2];
+
+		/* Arreglo de pipes */
+		int *arregloPipes;
+		arregloPipes = (int *)malloc(sizeof(int)*n);
+
 		/* Arreglo de procesos hijos */  
   		pid_t hijos[n];
 
   		/* Ciclo generador de los procesos hijos */
   		for (j = 0; j < n; ++j) {
+
+  			arregloPipes[j] = pipe(fd);
 
 			if ((hijos[j] = fork()) == -1) {
 			  printf("Hubo un error al crear un hijo, el programa se detendra\n");
@@ -110,6 +115,10 @@ int main(int argc, char *argv[]) {
 			waitpid(hijos[j], &status, 0);
 			status = WEXITSTATUS(status);		
 		}		
+
+		for (j = 0; j < n; ++j) {
+			LeerPipes(arregloPipes[j], salida);
+		}
 
 	}
 

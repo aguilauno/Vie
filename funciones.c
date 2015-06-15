@@ -145,8 +145,77 @@ void AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre) {
 			printf(" Es un archivo regular\n");
 		}
 
+		EscribirPipes(arregloPipes, directorioActual);
 		free(texto);
 		free(directorioActual);
 	}
 	
+}
+
+/* EscribirPipes
+* Procedimiento donde los procesos hijos escriben en los pipes.
+*/
+void EscribirPipes(int *fd, char *directorioActual) {
+
+	char *buffer; 
+ 	buffer = (char *)malloc(sizeof(char)*TAM);
+
+    close(fd[0]); /* Cerramos la lectura del pipe */
+
+    buffer = LeerArchivo(directorioActual, buffer);
+
+    write(fd[1], buffer, strlen(buffer));
+    close(fd[1]);
+
+}
+
+/* LeerPipes
+* Procedimiento donde el proceso padre lee del pipe.
+*/
+void LeerPipes(int *fd, char *salida) {
+
+    close(fd[1]); /* Cerramos la escritura del pipe */
+
+    EscribirArchivo(salida);
+    read(fd[0], buffer, SIZE)
+    // while((readbytes=read(p[0], buffer, SIZE)) > 0) {
+    //     //fprintf(archivo1, "%s",buffer);
+    //     fwrite(buffer, 1, readbytes,archivo1);
+    // }
+    fclose(archivo1); 
+    close(fd[0]);
+}
+
+/* LeerArchivo
+* Procedimiento donde los procesos hijos leen de los archivos.
+* de texto
+*/
+char *LeerArchivo(char *directorioActual, char *buffer) {
+
+	FILE *fp;
+	fp = fopen(directorioActual, "r");
+ 
+ 	if (fp == NULL)
+ 		exit(1);
+ 
+ 	while (feof(fp) == 0)
+ 	{
+ 		fgets(buffer,TAM,fp);
+ 		printf("%s",buffer);
+ 	}
+
+	fclose(fp);
+
+	return buffer;
+}
+
+/* EscribirArchivo
+* Procedimiento donde el proceso padre escribe en el archivo
+* final de texto.
+*/
+void EscribirArchivo(char *salida) {
+
+	fp = fopen(salida,"w");
+
+	fclose(fp);
 }
