@@ -32,7 +32,20 @@
 int cmpfunc(const void *a, const void *b);
 /* Genera el apuntador a un arreglo de números aleatorios */
 int *secuenciaRandom(int tamSecuencia, int randMax);
+<<<<<<< HEAD
 /* Procedimiento para acceder a las carpetas necesarias */
 void AccesoCarpetas(DIR *dir, int n, int m, int *arregloDirectorios, int *arregloTextos, int argc, char *cadena);
+=======
 /* */
-void AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre, char *slash);
+void AccesoCarpetas(DIR *dir, int n, int m, int j, int *arregloDirectorios, int *arregloTextos, int argc, char *cadena);
+>>>>>>> origin/developpeurs
+/* */
+void AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre);
+/* */
+void LeerPipes(int *pipe);
+/* */
+void EscribirPipes(int *pipe);
+/* */
+char *LeerArchivo(char *directorioActual, char *buffer);
+/* */
+void EscribirArchivo(char *salida);

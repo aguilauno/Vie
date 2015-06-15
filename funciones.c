@@ -58,6 +58,7 @@ int *secuenciaRandom(int tamSecuencia, int randMax) {
     return arreglo;
 }
 
+<<<<<<< HEAD
 /* AccesoCarpetas
 * Accede a las carpetas correspondientes para hacer la verificación de si son 
 * directorios o no.
@@ -70,60 +71,52 @@ int *secuenciaRandom(int tamSecuencia, int randMax) {
 * los archivos a los que accesará cada uno de los procesos hijos
 */ 
 void AccesoCarpetas(DIR *dir, int n, int m, int *arregloDirectorios, int *arregloTextos, int argc, char *cadena) {
+=======
+void AccesoCarpetas(DIR *dir, int n, int m, int j, int *arregloDirectorios, int *arregloTextos, int argc, char *cadena) {
+>>>>>>> origin/developpeurs
 
 	struct stat buffer; 		//Buffer con la informacion de la entrada
 	struct dirent *direntd;
 	struct dirent *direntd2;
 	direntd = readdir(dir);
-	int i,j, tam, rpta;
+	int tam, rpta;
 	tam = (unsigned) strlen(dir);
 
-	for (i = 0; i < n; i++) {
+	rpta = *(arregloDirectorios + j);
 
-		rpta = *(arregloDirectorios + i);
+	char *texto, *slash, *nombre, *directorioPrin;
+	DIR *dir2;
 
-		char *texto, *slash, *nombre, *directorioPrin;
-		DIR *dir2;
+	texto = (char *)malloc(sizeof(char)*TAM);
+	nombre = (char *)malloc(sizeof(char)*TAM);
+	directorioPrin = (char *)malloc(sizeof(char)*tam);
 
-		texto = (char *)malloc(sizeof(char)*TAM);
-		slash = (char *)malloc(sizeof(char)*TAM);
-		nombre = (char *)malloc(sizeof(char)*TAM);
-		directorioPrin = (char *)malloc(sizeof(char)*tam);
+	sprintf(texto, "%d", rpta);
 
-		slash = "/";
-		sprintf(texto, "%d", rpta);
+	if (argc == 6) {
+		strcpy(directorioPrin, cadena);
+		strcpy(nombre, directorioPrin);
+		strcat(nombre, texto);
+		strcat(nombre,"\0");
+		//printf("%s\n", nombre);	
+	}
+	else if (argc == 4) {
+		getcwd(directorioPrin, TAM);
+		strcpy(nombre, directorioPrin);
+		strcat(nombre, "/");
+		strcat(nombre, texto);
+		strcat(nombre,"\0");
+		//printf("%s\n", nombre);
+	}
 
-		/* Leemos las entradas del direntd */
-
-		// while ( (direntd = readdir(dir) ) != NULL) {
-	 	//   		printf("%d\t%d\t%d\t%s\n", direntd->d_ino, direntd->d_off, direntd->d_reclen, direntd->d_name);
-	 	//  	}
-
-		if (argc == 6) {
-			directorioPrin = cadena;
-			strcpy(nombre, directorioPrin);
-			strcat(nombre, texto);
-			//printf(nombre);	
-		}
-		else if (argc == 4) {
-			getcwd(directorioPrin, TAM);
-			strcpy(nombre, directorioPrin);
-			strcat(nombre, slash);
-			strcat(nombre, texto);
-			//printf(nombre);
-		}
-
-		j = 0;
-		j = stat(nombre, &buffer);
-
-		if (j != 0) {
-			printf(" No se pudo obtener la informacion de la carpeta %s\n", nombre);
-			perror(" El error fue el siguiente ");
-	    	exit(-1);	
-		}
-		else if (S_ISDIR(buffer.st_mode)) {
-			//printf(" Es un directorio ");
-		}
+	if (stat(nombre, &buffer) != 0) {
+		printf(" No se pudo obtener la informacion de la carpeta %s\n", nombre);
+		perror(" El error fue el siguiente ");
+    	exit(-1);	
+	}
+	else if (S_ISDIR(buffer.st_mode)) {
+		printf(" Es un directorio\n\n");
+	}
 
 	if ( (dir2 = opendir(texto)) == NULL) {
 
@@ -134,40 +127,39 @@ void AccesoCarpetas(DIR *dir, int n, int m, int *arregloDirectorios, int *arregl
 		//printf(" El directorio actual es %s\n", texto);
 	}
 
-	 /* Leemos las entradas del direntd */
-	
 	direntd2 = readdir(dir2);
 
-	// while ( (direntd2 = readdir(dir2) ) != NULL) {
-	//  	printf("%d\t%d\t%d\t%s\n", direntd2->d_ino, direntd2->d_off, direntd2->d_reclen, direntd2->d_name);
-	// }
-	AccesoArchivos(dir2, m, arregloTextos, nombre, slash);
+	printf("Antes de AccesoArchivos\n");
+	AccesoArchivos(dir2, m, arregloTextos, nombre);
+	printf("Despues de AccesoArchivos\n");
+
 	free(directorioPrin);
 	free(texto);
-	}
+	free(nombre);
+	closedir(dir2);
+
 }
 
-void AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre, char *slash) {
-
-	int i,j,rpta,tam2;
+void AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre) {
+	
+	int i,rpta,tam2;
 	struct stat buffer2; 		//Buffer con la informacion de la entrada
-	char *texto, directorioActual;
+	char *texto, *directorioActual;
 	tam2 = (unsigned) strlen(dir2);
-
-	texto = (char *)malloc(sizeof(char)*TAM);
-	directorioActual = (char *)malloc(sizeof(char)*tam2);
 
 	for (i = 0; i < m; i++) {
 
+		texto = (char *)malloc(sizeof(char)*TAM);
+		directorioActual = (char *)malloc(sizeof(nombre)+64);
+
 		rpta = *(arregloTextos + i);
-
 		sprintf(texto, "%d", rpta);
-
-		directorioActual = nombre;
-		strcat(directorioActual, slash);
+		
+		strcpy(directorioActual, nombre);
+		strcat(directorioActual, "/");
 		strcat(directorioActual, texto);
 		strcat(directorioActual,"\0");
-		printf(directorioActual);
+		printf("\n%s\n", directorioActual);
 
 		if (stat(directorioActual, &buffer2) != 0) {
 			printf(" No se pudo obtener la informacion del archivo %s\n", directorioActual);
@@ -176,14 +168,80 @@ void AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre, char *sl
 		}
 
 		else if (S_ISREG(buffer2.st_mode)) {
-			printf(" Es un archivo regular ");
+			printf(" Es un archivo regular\n");
 		}
 
+		EscribirPipes(arregloPipes, directorioActual);
+		free(texto);
+		free(directorioActual);
 	}
+	
+}
 
-	free(texto);
-	free(directorioActual);
-	free(slash);
-	free(nombre);
-	closedir(dir2);
+/* EscribirPipes
+* Procedimiento donde los procesos hijos escriben en los pipes.
+*/
+void EscribirPipes(int *fd, char *directorioActual) {
+
+	char *buffer; 
+ 	buffer = (char *)malloc(sizeof(char)*TAM);
+
+    close(fd[0]); /* Cerramos la lectura del pipe */
+
+    buffer = LeerArchivo(directorioActual, buffer);
+
+    write(fd[1], buffer, strlen(buffer));
+    close(fd[1]);
+
+}
+
+/* LeerPipes
+* Procedimiento donde el proceso padre lee del pipe.
+*/
+void LeerPipes(int *fd, char *salida) {
+
+    close(fd[1]); /* Cerramos la escritura del pipe */
+
+    EscribirArchivo(salida);
+    read(fd[0], buffer, SIZE)
+    // while((readbytes=read(p[0], buffer, SIZE)) > 0) {
+    //     //fprintf(archivo1, "%s",buffer);
+    //     fwrite(buffer, 1, readbytes,archivo1);
+    // }
+    fclose(archivo1); 
+    close(fd[0]);
+}
+
+/* LeerArchivo
+* Procedimiento donde los procesos hijos leen de los archivos.
+* de texto
+*/
+char *LeerArchivo(char *directorioActual, char *buffer) {
+
+	FILE *fp;
+	fp = fopen(directorioActual, "r");
+ 
+ 	if (fp == NULL)
+ 		exit(1);
+ 
+ 	while (feof(fp) == 0)
+ 	{
+ 		fgets(buffer,TAM,fp);
+ 		printf("%s",buffer);
+ 	}
+
+	fclose(fp);
+
+	return buffer;
+}
+
+/* EscribirArchivo
+* Procedimiento donde el proceso padre escribe en el archivo
+* final de texto.
+*/
+void EscribirArchivo(char *salida) {
+
+	fp = fopen(salida,"w");
+
+	fclose(fp);
 }
