@@ -60,32 +60,12 @@ int main(int argc, char *argv[]) {
 			exit(1);
 		}
 
-<<<<<<< HEAD
 		int *arregloDirectorios; /* Arreglo de cantidad n para números 
 									aleatorios para el acceso a carpetas */
-		int *arregloTextos;		 /* Arreglo de cantidad m para números 
-									aleatorios para el acceso a archivos */
-=======
-		salida = strdup(argv[i]); /* Obtenemos el archivo de salida */
 
-		int *arregloDirectorios;
->>>>>>> origin/developpeurs
+		salida = strdup(argv[i]); /* Obtenemos el archivo de salida */
 		
 		arregloDirectorios = secuenciaRandom(n, MAX_N);
-		
-
-		/* Prueba de manejo de apuntadores de arreglos */
-		 // int j;
-		 // printf("\n\n");
-		 // for (j = 0; j < n; ++j)
-		 // 	printf("%d ", *(arregloDirectorios + j));
-		 // printf("\n");
-		 // for (j = 0; j < m; ++j)
-		 // 	printf("%d ", *(arregloTextos + j));
-		 // printf("\n\n\n");
-
-		/* Crear n procesos hijos y cada uno toma control
-		 * de la carpeta que le tocó aleatoriamente */
 
 		/* Inicializamos el pipe */
 		int fd[2];
@@ -97,7 +77,8 @@ int main(int argc, char *argv[]) {
 		/* Arreglo de procesos hijos */  
   		pid_t hijos[n];
 
-  		/* Ciclo generador de los procesos hijos */
+  		/* Crear n procesos hijos y cada uno toma control de la carpeta que le 
+  		   tocó aleatoriamente. Ciclo generador de los procesos hijos */
   		for (j = 0; j < n; ++j) {
 
   			arregloPipes[j] = pipe(fd);
@@ -128,6 +109,7 @@ int main(int argc, char *argv[]) {
 			status = WEXITSTATUS(status);		
 		}		
 
+		/* Ciclo para que el proceso padre lea de los pipes */
 		for (j = 0; j < n; ++j) {
 			LeerPipes(arregloPipes[j], salida);
 		}

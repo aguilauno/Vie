@@ -58,24 +58,23 @@ int *secuenciaRandom(int tamSecuencia, int randMax) {
     return arreglo;
 }
 
-<<<<<<< HEAD
 /* AccesoCarpetas
 * Accede a las carpetas correspondientes para hacer la verificación de si son 
 * directorios o no.
 * dir: directorio en el que se hará acceso para lectura de carpetas y archivos
 * n: cantidad de elementos a recorrer en el arregloDirectorios
 * m: cantidad de elementos a recorrer en el arregloTextos
+* j: iteracion en la que se encuentra el proceso hijo
 * arregloDirectorios: arreglo que contiene cada uno de los números que 
 * representan las carpetas a los que accesará cada uno de los procesos hijos
-* arregloTextos: arreglo que contiene cada uno de los números que representan 
+* arregloTextos: arreglo que contiene cada uno de los números que representan
 * los archivos a los que accesará cada uno de los procesos hijos
+* argc: cantidad de argumentos de la ejecución principal
+* cadena: string donde se encuentra el directorio principal
 */ 
-void AccesoCarpetas(DIR *dir, int n, int m, int *arregloDirectorios, int *arregloTextos, int argc, char *cadena) {
-=======
 void AccesoCarpetas(DIR *dir, int n, int m, int j, int *arregloDirectorios, int *arregloTextos, int argc, char *cadena) {
->>>>>>> origin/developpeurs
 
-	struct stat buffer; 		//Buffer con la informacion de la entrada
+	struct stat buffer; 		
 	struct dirent *direntd;
 	struct dirent *direntd2;
 	direntd = readdir(dir);
@@ -137,13 +136,22 @@ void AccesoCarpetas(DIR *dir, int n, int m, int j, int *arregloDirectorios, int 
 	free(texto);
 	free(nombre);
 	closedir(dir2);
-
 }
 
+/* AccesoArchivos
+ * Accede a los archivos correspondientes para la verificación de si son 
+ * archivos regulares o no
+ * dir2: directorio donde ya se accede a las carpetas existentes del 1 al 10
+ * m: cantidad de elementos a recorrer en el arregloTextos
+ * arregloTextos: arreglo que contiene cada uno de los números que representan
+ * los archivos a los que accesará cada uno de los procesos hijos
+ * nombre: string que guarda la ruta donde estan las carpetas desde el 
+ * directorio principal
+ */
 void AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre) {
 	
 	int i,rpta,tam2;
-	struct stat buffer2; 		//Buffer con la informacion de la entrada
+	struct stat buffer2; 		
 	char *texto, *directorioActual;
 	tam2 = (unsigned) strlen(dir2);
 
@@ -175,11 +183,13 @@ void AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre) {
 		free(texto);
 		free(directorioActual);
 	}
-	
 }
 
 /* EscribirPipes
 * Procedimiento donde los procesos hijos escriben en los pipes.
+* fd: arreglo de pipes
+* directorioActual: ruta principal junto a la carpeta correspondiente y archivo
+* correspondiente
 */
 void EscribirPipes(int *fd, char *directorioActual) {
 
@@ -192,11 +202,13 @@ void EscribirPipes(int *fd, char *directorioActual) {
 
     write(fd[1], buffer, strlen(buffer));
     close(fd[1]);
-
 }
 
 /* LeerPipes
 * Procedimiento donde el proceso padre lee del pipe.
+* fd: arreglo de pipes
+* salida: archivo donde el proceso padre escribirá todos los archivos de textos
+* leídos por los procesos hijos 
 */
 void LeerPipes(int *fd, char *salida) {
 
@@ -213,8 +225,12 @@ void LeerPipes(int *fd, char *salida) {
 }
 
 /* LeerArchivo
-* Procedimiento donde los procesos hijos leen de los archivos.
-* de texto
+* Procedimiento donde los procesos hijos leen de los archivos de texto.
+* directorioActual: directorio dessde donde los procesos hijos van a leer sus
+* respectivos archivos de texto
+* buffer: guardará en un buffer lo que un proceso hijo leyó de un archivo de 
+* texto
+* retorna un buffer 
 */
 char *LeerArchivo(char *directorioActual, char *buffer) {
 
@@ -238,6 +254,8 @@ char *LeerArchivo(char *directorioActual, char *buffer) {
 /* EscribirArchivo
 * Procedimiento donde el proceso padre escribe en el archivo
 * final de texto.
+* salida: archivo donde se encuentra todo el archivo final creado por el proceso
+* padre
 */
 void EscribirArchivo(char *salida) {
 
