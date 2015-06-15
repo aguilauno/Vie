@@ -62,33 +62,25 @@ void AccesoCarpetas(DIR *dir, int n, int m, int j, int *arregloDirectorios, int 
 	DIR *dir2;
 
 	texto = (char *)malloc(sizeof(char)*TAM);
-	slash = (char *)malloc(sizeof(char)*TAM);
 	nombre = (char *)malloc(sizeof(char)*TAM);
 	directorioPrin = (char *)malloc(sizeof(char)*tam);
 
-	slash = "/";
 	sprintf(texto, "%d", rpta);
-
-	/* Leemos las entradas del direntd */
-
-	// while ( (direntd = readdir(dir) ) != NULL) {
- 	//   		printf("%d\t%d\t%d\t%s\n", direntd->d_ino, direntd->d_off, direntd->d_reclen, direntd->d_name);
- 	//  	}
 
 	if (argc == 6) {
 		strcpy(directorioPrin, cadena);
 		strcpy(nombre, directorioPrin);
 		strcat(nombre, texto);
 		strcat(nombre,"\0");
-		printf("%s\n", nombre);	
+		//printf("%s\n", nombre);	
 	}
 	else if (argc == 4) {
 		getcwd(directorioPrin, TAM);
 		strcpy(nombre, directorioPrin);
-		strcat(nombre, slash);
+		strcat(nombre, "/");
 		strcat(nombre, texto);
 		strcat(nombre,"\0");
-		printf("%s\n", nombre);
+		//printf("%s\n", nombre);
 	}
 
 	if (stat(nombre, &buffer) != 0) {
@@ -97,7 +89,7 @@ void AccesoCarpetas(DIR *dir, int n, int m, int j, int *arregloDirectorios, int 
     	exit(-1);	
 	}
 	else if (S_ISDIR(buffer.st_mode)) {
-		printf("	Es un directorio\n\n");
+		printf(" Es un directorio\n\n");
 	}
 
 	if ( (dir2 = opendir(texto)) == NULL) {
@@ -112,44 +104,36 @@ void AccesoCarpetas(DIR *dir, int n, int m, int j, int *arregloDirectorios, int 
 	direntd2 = readdir(dir2);
 
 	printf("Antes de AccesoArchivos\n");
-	//getFullName(nombre, direntd2);
-	AccesoArchivos(dir2, m, arregloTextos, nombre, slash);
+	AccesoArchivos(dir2, m, arregloTextos, nombre);
 	printf("Despues de AccesoArchivos\n");
 
 	free(directorioPrin);
 	free(texto);
 	free(nombre);
-	free(slash);
 	closedir(dir2);
 
 }
 
-void AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre, char *slash) {
+void AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre) {
 	
 	int i,rpta,tam2;
 	struct stat buffer2; 		//Buffer con la informacion de la entrada
-	char *texto, directorioActual;
+	char *texto, *directorioActual;
 	tam2 = (unsigned) strlen(dir2);
 
-	texto = (char *)malloc(sizeof(char)*TAM);
-	directorioActual = (char *)malloc(sizeof(char)*tam2);
-
-	
-	printf("Aqui vale m:%d\n", m);
 	for (i = 0; i < m; i++) {
-		//printf("%dhola%d\n", i, m);
+
+		texto = (char *)malloc(sizeof(char)*TAM);
+		directorioActual = (char *)malloc(sizeof(nombre)+64);
 
 		rpta = *(arregloTextos + i);
-		printf("%d\n", rpta);
 		sprintf(texto, "%d", rpta);
 		
-		printf("nombre:%s\n", nombre);
 		strcpy(directorioActual, nombre);
-		printf("directorioActual:%s\n", directorioActual);
-		strcat(directorioActual, slash);
+		strcat(directorioActual, "/");
 		strcat(directorioActual, texto);
 		strcat(directorioActual,"\0");
-		printf(directorioActual);
+		printf("\n%s\n", directorioActual);
 
 		if (stat(directorioActual, &buffer2) != 0) {
 			printf(" No se pudo obtener la informacion del archivo %s\n", directorioActual);
@@ -158,13 +142,11 @@ void AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre, char *sl
 		}
 
 		else if (S_ISREG(buffer2.st_mode)) {
-			printf(" Es un archivo regular ");
+			printf(" Es un archivo regular\n");
 		}
-
-		printf("%d\n", i);
 
 		free(texto);
 		free(directorioActual);
 	}
 	
-	}
+}

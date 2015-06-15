@@ -121,5 +121,7 @@ int main(int argc, char *argv[]) {
 
 	closedir(dir);
 
+	free(cadena);
+	free(salida);
 	return 0;
 } 
