@@ -8,6 +8,12 @@
 
 #include "funciones.h"
 
+/* Manejador de la señal */
+
+//void signalHandler(int sig_num)          // Funcion que controla la señal SIGINT
+//{
+//  signal(SIGINT,signalHandler);
+
  /* Programa principal */
 
 int main(int argc, char *argv[]) {
@@ -95,7 +101,7 @@ int main(int argc, char *argv[]) {
 		    	arregloTextos = secuenciaRandom(m, MAX_M);
 		    	//printf("Soy el hijo con pid %d, iteracion:%d\n", getpid(), j);
 
-		    	AccesoCarpetas(dir, n, m, j, arregloDirectorios, arregloTextos, argc, cadena);
+		    	AccesoCarpetas(dir, n, m, j, arregloDirectorios, arregloTextos, argc, cadena, arregloPipes[j]);
 		    	exit(0);
 			}
 			// else {
@@ -110,9 +116,14 @@ int main(int argc, char *argv[]) {
 		}		
 
 		/* Ciclo para que el proceso padre lea de los pipes */
+		char *bufferRead;
+		bufferRead = (char *)malloc(sizeof(char)*TAM);
+
 		for (j = 0; j < n; ++j) {
-			LeerPipes(arregloPipes[j], salida);
+			LeerPipes(arregloPipes[j], salida, bufferRead);
 		}
+
+		free(bufferRead);
 
 	}
 
