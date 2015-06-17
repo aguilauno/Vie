@@ -25,19 +25,21 @@ int cmpfunc(const void *a, const void *b) {
 * randMax: número máximo posible que se puede obtener del random
 * retorna el arreglo ordenado de menor a mayor
 */ 
-int *secuenciaRandom(int tamSecuencia, int randMax) {
+int *secuenciaRandom(int tamSecuencia, int randMax, int pidHijo) {
 	/* Utilizando el algoritmo Floyd para evitar números repetidos */
 	unsigned char utilizado[randMax];
 	memset(utilizado, 0, randMax * sizeof(unsigned char)); /* flags */ 
 
 	int in, im;
+	int randi;
 	int *arreglo = malloc(sizeof(int) * tamSecuencia); 
 	im = 0;
 
-	/* Se inicializa la semilla del random con time() */
-	srand(time(NULL));
+	/* Se inicializa la semilla del random con time() y pidHijo */
+	srand(time(NULL) + pidHijo);
 
 	for (in = randMax - tamSecuencia; in < randMax && im < tamSecuencia; ++in) {
+
 		int r = rand() % (in + 1); /* Se genera un número aleatorio 'r' */
 
 		if (utilizado[r]) {
@@ -181,6 +183,12 @@ void AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre, int *fd)
 		}
 
 		EscribirPipes(fd, directorioActual);
+		
+		// char *buff;
+		// buff = (char *)malloc(sizeof(char)*TAM2);
+		// buff = LeerArchivo(directorioActual);
+		// printf("\n---------\n");
+		// free(buff);
 		free(texto);
 		free(directorioActual);
 	}
@@ -196,13 +204,14 @@ void EscribirPipes(int *fd, char *directorioActual) {
 
 	char *buffer; 
  	buffer = (char *)malloc(sizeof(char)*TAM2);
+ 	printf("Pipe: %d\n", fd[0]);
 
     close(fd[0]); /* Cerramos la lectura del pipe */
 
     buffer = LeerArchivo(directorioActual);
 
     write(fd[1], buffer, strlen(buffer));
-    close(fd[1]);
+    //close(fd[1]);
     free(buffer);
 }
 
@@ -212,14 +221,22 @@ void EscribirPipes(int *fd, char *directorioActual) {
 * salida: archivo donde el proceso padre escribirá todos los archivos de textos
 * leídos por los procesos hijos 
 */
-void LeerPipes(int *fd, char *salida, char *bufferRead) {
+void LeerPipes(int *fd, char *salida) {
 
-    close(fd[1]); /* Cerramos la escritura del pipe */
+	close(fd[1]); /* Cerramos la escritura del pipe */
+
+	char *bufferRead;
+				
+	bufferRead = (char *)malloc(sizeof(char)*TAM);
 
     read(fd[0], bufferRead, TAM2);
+    printf("%s\n", bufferRead);
+
     EscribirArchivo(salida, bufferRead);
 
-    close(fd[0]);
+    free(bufferRead);
+
+    //close(fd[0]);
 }
 
 /* LeerArchivo
@@ -250,6 +267,8 @@ char *LeerArchivo(char *directorioActual) {
 
 	fclose(fp);
 
+	EscribirArchivo("salida.txt", buf);
+
 	return buf;
 }
 
@@ -262,7 +281,7 @@ char *LeerArchivo(char *directorioActual) {
 void EscribirArchivo(char *salida, char *bufferRead) {
 
 	FILE *fp;
-	fp = fopen(salida,"w");
+	fp = fopen(salida,"w+");
 
 	fprintf(fp, bufferRead);
 
