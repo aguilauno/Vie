@@ -106,8 +106,7 @@ int main(int argc, char *argv[]) {
 		    	//printf("Soy el hijo con pid %d, iteracion:%d\n", getpid(), j);
 
 		    	AccesoCarpetas(dir, n, m, j, arregloDirectorios, arregloTextos, argc, cadena, fd);
-		    	
-		    	//close(fd[1]);
+
 		    	exit(0);
 			}
 			else {
@@ -125,8 +124,8 @@ int main(int argc, char *argv[]) {
 		LeerPipes(fd, salida);
 
 		/* Ciclo para que el proceso padre lea de los pipes */
-
-	}
+			//LeerPipes(arregloPipes[j], salida);	
+	}		
 
 	else if (argc > 6 || argc < 4) { /* Cuando no se indican los parámetros necesarios */
 

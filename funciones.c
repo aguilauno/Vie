@@ -247,6 +247,7 @@ void LeerPipes(int fd[], char *salida) {
     countbytes = read(fd[0], bufferRead, sizeof(bufferRead)*TAM2);
     printf("\nentro en leerPipes con %d\n", countbytes);
 
+
     EscribirArchivo(salida, bufferRead);
 
     free(bufferRead);
@@ -284,8 +285,6 @@ char *LeerArchivo(char *directorioActual) {
 
 	fclose(fp);
 
-	//EscribirArchivo("salida.txt", buf);
-
 	return buf;
 }
 
@@ -298,7 +297,7 @@ char *LeerArchivo(char *directorioActual) {
 void EscribirArchivo(char *salida, char *bufferRead) {
 
 	FILE *fp;
-	fp = fopen(salida,"w");
+	fp = fopen(salida,"w+");
 
 	fprintf(fp, bufferRead);
 	fprintf(fp, "\n");
