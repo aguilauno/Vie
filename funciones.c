@@ -25,19 +25,21 @@ int cmpfunc(const void *a, const void *b) {
 * randMax: número máximo posible que se puede obtener del random
 * retorna el arreglo ordenado de menor a mayor
 */ 
-int *secuenciaRandom(int tamSecuencia, int randMax) {
+int *secuenciaRandom(int tamSecuencia, int randMax, int pidHijo) {
 	/* Utilizando el algoritmo Floyd para evitar números repetidos */
 	unsigned char utilizado[randMax];
 	memset(utilizado, 0, randMax * sizeof(unsigned char)); /* flags */ 
 
 	int in, im;
+	int randi;
 	int *arreglo = malloc(sizeof(int) * tamSecuencia); 
 	im = 0;
 
-	/* Se inicializa la semilla del random con time() */
-	srand(time(NULL));
+	/* Se inicializa la semilla del random con time() y pidHijo */
+	srand(time(NULL) + pidHijo);
 
 	for (in = randMax - tamSecuencia; in < randMax && im < tamSecuencia; ++in) {
+
 		int r = rand() % (in + 1); /* Se genera un número aleatorio 'r' */
 
 		if (utilizado[r]) {
@@ -72,7 +74,7 @@ int *secuenciaRandom(int tamSecuencia, int randMax) {
 * argc: cantidad de argumentos de la ejecución principal
 * cadena: string donde se encuentra el directorio principal
 */ 
-void AccesoCarpetas(DIR *dir, int n, int m, int j, int *arregloDirectorios, int *arregloTextos, int argc, char *cadena, int *fd) {
+void AccesoCarpetas(DIR *dir, int n, int m, int j, int *arregloDirectorios, int *arregloTextos, int argc, char *cadena, int fd[]) {
 
 	struct stat bstat; 		
 	struct dirent *direntd;
@@ -84,7 +86,7 @@ void AccesoCarpetas(DIR *dir, int n, int m, int j, int *arregloDirectorios, int 
 	//direntd -> direntd_name;
 	rpta = *(arregloDirectorios + j);
 
-	char *texto, *slash, *nombre, *directorioPrin;
+	char *texto, *slash, *nombre, *directorioPrin;	
 	DIR *dir2;
 
 	texto = (char *)malloc(sizeof(char)*TAM);
@@ -149,7 +151,7 @@ void AccesoCarpetas(DIR *dir, int n, int m, int j, int *arregloDirectorios, int 
  * nombre: string que guarda la ruta donde estan las carpetas desde el 
  * directorio principal
  */
-void AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre, int *fd) {
+void AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre, int fd[]) {
 	
 	int i,rpta,tam2;
 	struct stat bstat2; 		
@@ -178,9 +180,14 @@ void AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre, int *fd)
 
 		else if (S_ISREG(bstat2.st_mode)) {
 			printf(" Es un archivo regular\n");
+			EscribirPipes(fd, directorioActual);
 		}
 
-		EscribirPipes(fd, directorioActual);
+		// char *buff;
+		// buff = (char *)malloc(sizeof(char)*TAM2);
+		// buff = LeerArchivo(directorioActual);
+		// printf("\n---------\n");
+		// free(buff);
 		free(texto);
 		free(directorioActual);
 	}
@@ -192,18 +199,34 @@ void AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre, int *fd)
 * directorioActual: ruta principal junto a la carpeta correspondiente y archivo
 * correspondiente
 */
-void EscribirPipes(int *fd, char *directorioActual) {
+void EscribirPipes(int fd[], char *directorioActual) {
 
-	char *buffer; 
+	int countbytes;
+	//char text[99999999];
+	char *buffer;
+	char *superbuffer;
  	buffer = (char *)malloc(sizeof(char)*TAM2);
-
-    close(fd[0]); /* Cerramos la lectura del pipe */
+ 	superbuffer = (char *)malloc(sizeof(char)*TAM2+64);
+ 	//printf("Pipe: %d\n", fd[0]);
+    //close(fd[0]);
 
     buffer = LeerArchivo(directorioActual);
 
-    write(fd[1], buffer, strlen(buffer));
-    close(fd[1]);
+    strcpy(superbuffer, buffer);
+    strcat(superbuffer, "\n");
+
+    //printf("%s\n", superbuffer);
+ 
+    write(fd[1], superbuffer, (strlen(superbuffer)+1));
+
+    //printf("%s\n", buffer);
+    
+    /*countbytes = read(fd[0], buffer, strlen(buffer));
+
+    printf("%d: %s\n", countbytes, buffer);*/
+    //close(fd[1]);
     free(buffer);
+    //free(text);
 }
 
 /* LeerPipes
@@ -212,14 +235,23 @@ void EscribirPipes(int *fd, char *directorioActual) {
 * salida: archivo donde el proceso padre escribirá todos los archivos de textos
 * leídos por los procesos hijos 
 */
-void LeerPipes(int *fd, char *salida, char *bufferRead) {
+void LeerPipes(int fd[], char *salida) {
 
-    close(fd[1]); /* Cerramos la escritura del pipe */
+	close(fd[1]); /* Cerramos la escritura del pipe */
 
-    read(fd[0], bufferRead, TAM2);
+	char *bufferRead;
+	int countbytes;
+				
+	bufferRead = (char *)malloc(sizeof(char)*TAM2);
+
+    countbytes = read(fd[0], bufferRead, sizeof(bufferRead)*TAM2);
+    printf("\nentro en leerPipes con %d\n", countbytes);
+
     EscribirArchivo(salida, bufferRead);
 
-    close(fd[0]);
+    free(bufferRead);
+
+    //close(fd[0]);
 }
 
 /* LeerArchivo
@@ -245,10 +277,14 @@ char *LeerArchivo(char *directorioActual) {
  	while (feof(fp) == 0)
  	{
  		fgets(buf,TAM2,fp);
- 		printf("%s",buf);
+ 		//printf("%s",buf);
  	}
 
+ 	printf("%s\n", buf);
+
 	fclose(fp);
+
+	//EscribirArchivo("salida.txt", buf);
 
 	return buf;
 }
@@ -265,6 +301,7 @@ void EscribirArchivo(char *salida, char *bufferRead) {
 	fp = fopen(salida,"w");
 
 	fprintf(fp, bufferRead);
+	fprintf(fp, "\n");
 
 	fclose(fp);
 }
