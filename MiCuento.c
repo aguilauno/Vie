@@ -78,9 +78,9 @@ int main(int argc, char *argv[]) {
 		/* Inicializamos el pipe */
 		int fd[2];
 
-		/* Arreglo de pipes */
-		int *arregloPipes;
-		arregloPipes = (int *)malloc(sizeof(int)*n);
+		// /* Arreglo de pipes */
+		// int *arregloPipes;
+		// arregloPipes = (int *)malloc(sizeof(int)*n);
 
 		/* Arreglo de procesos hijos */  
   		pid_t hijos[n];
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
   		   tocó aleatoriamente. Ciclo generador de los procesos hijos */
   		for (j = 0; j < n; ++j) {
 
-  			arregloPipes[j] = pipe(fd);
+  			pipe(fd);
 
 			if ((hijos[j] = fork()) == -1) {
 			  printf("Hubo un error al crear un hijo, el programa se detendra\n");
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
 		    	arregloTextos = secuenciaRandom(m, MAX_M, getpid());
 		    	//printf("Soy el hijo con pid %d, iteracion:%d\n", getpid(), j);
 
-		    	AccesoCarpetas(dir, n, m, j, arregloDirectorios, arregloTextos, argc, cadena, arregloPipes[j]);
+		    	AccesoCarpetas(dir, n, m, j, arregloDirectorios, arregloTextos, argc, cadena, fd);
 		    	exit(0);
 			}
 			else {
