@@ -8,12 +8,6 @@
 
 #include "funciones.h"
 
-/* Manejador de la señal */
-
-//void signalHandler(int sig_num)          // Funcion que controla la señal SIGINT
-//{
-//  signal(SIGINT,signalHandler);
-
  /* Programa principal */
 
 int main(int argc, char *argv[]) {
@@ -23,23 +17,13 @@ int main(int argc, char *argv[]) {
 
 	DIR *dir; /* Directorio principal a abrir */
 
-	//cadena = (char *)malloc(sizeof(char)*TAM); 
-	/* Donde se guardara el 
-												  directorio a abrir que se 
-												  indica en la ejecución */
-	//salida = (char *)malloc(sizeof(char)*TAM); 
-	/* Donde se guardara el archivo 
-												  con la escritura de todos los
-												  archivos que han tomado los 
-												  hijos */
-
 	if ((argc == 6) || (argc == 4)) { /* Verificación de parámetros */
 		
 		if (argc == 6) {
 			/* Cuando se colocan todos los parámetros completos */
 			i = 2;
 			if ((dir = opendir(argv[i++])) == NULL) {
-				perror(" No se puede abrir el directorio ya que no existe 1");
+				perror(" No se puede abrir el directorio ya que no existe ");
 				exit(1);
 			}
 			cadena = argv[2];
@@ -49,7 +33,7 @@ int main(int argc, char *argv[]) {
 			/* Cuando no se coloca el directorio, se toma el directorio actual por default */
 			i = 1;
 			if ((dir = opendir(".")) == NULL) {
-				error(" No se puede abrir el directorio ya que no existe 2");
+				error(" No se puede abrir el directorio ya que no existe ");
 				exit(1);
 			}
 		}
@@ -78,53 +62,60 @@ int main(int argc, char *argv[]) {
 		/* Inicializamos el pipe */
 		int fd[2];
 
-		// /* Arreglo de pipes */
-		// int *arregloPipes;
-		// arregloPipes = (int *)malloc(sizeof(int)*n);
-
 		/* Arreglo de procesos hijos */  
   		pid_t hijos[n];
 
   		pipe(fd);
+
+  		char *superbuffer;
+ 		superbuffer = (char *)malloc(sizeof(char)*TAM2+64);
+
+ 		int contArchivosProc;
 
   		/* Crear n procesos hijos y cada uno toma control de la carpeta que le 
   		   tocó aleatoriamente. Ciclo generador de los procesos hijos */
   		for (j = 0; j < n; ++j) {
 
 			if ((hijos[j] = fork()) == -1) {
-			  printf("Hubo un error al crear un hijo, el programa se detendra\n");
+			  printf(" Hubo un error al crear un hijo, el programa se detendrá \n");
 			  exit(-1);
 			}
 
 		    if (hijos[j] == 0) {
 
-		    	close(fd[0]); /* Cerramos la lectura del pipe */
 				/* Luego cada proceso hijo genera m números aleatorios [1..20] para
 				 * seleccionar de sus textos cuales va a usar en el cuento */
 		    	int *arregloTextos;
 		    	arregloTextos = secuenciaRandom(m, MAX_M, getpid());
 		    	//printf("Soy el hijo con pid %d, iteracion:%d\n", getpid(), j);
 
-		    	AccesoCarpetas(dir, n, m, j, arregloDirectorios, arregloTextos, argc, cadena, fd);
+		    	contArchivosProc = AccesoCarpetas(dir, n, m, j, arregloDirectorios, arregloTextos, argc, cadena, fd, superbuffer);
 
-		    	exit(0);
+		    	if (j != n-1)
+					strcat(superbuffer, "\n\n");
+		    	
+		    	EscribirPipes(fd, superbuffer);
+		    	close(fd[1]); /* Cerramos la escritura del pipe */
+
+		    	free(superbuffer);
+
+		    	printf("CONTADOR DEL EXIT %d\n", contArchivosProc);
+
+		    	exit(contArchivosProc);
 			}
-			else {
+/*			else {
 				printf("Soy el Padre con ID= %ld, mi hijo es %ld\n",(long)getpid(),hijos[j]);
-			}
+			}*/
   		}
 
   		/* Ciclo que espera por los procesos hijos */
 		for (j = 0; j < n; ++j) {
 			waitpid(hijos[j], &status, 0);
 			status = WEXITSTATUS(status);	
-		}		
+		}	
 
-		//close(fd[1]);
 		LeerPipes(fd, salida);
-
-		/* Ciclo para que el proceso padre lea de los pipes */
-			//LeerPipes(arregloPipes[j], salida);	
+		close(fd[0]); /* Cerramos la lectura del pipe */
 	}		
 
 	else if (argc > 6 || argc < 4) { /* Cuando no se indican los parámetros necesarios */
@@ -135,7 +126,5 @@ int main(int argc, char *argv[]) {
 
 	closedir(dir);
 
-	//free(cadena);
-	//free(salida);
 	return 0;
 } 
