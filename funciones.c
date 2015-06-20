@@ -77,6 +77,7 @@ int *secuenciaRandom(int tamSecuencia, int randMax, int pidHijo) {
 * fd: pipe para procesos
 * superbuffer: buffer grande que guardará todos los archivos correspondientes 
 * a un hijo
+* retorna el contador de archivos que procesó
 */ 
 int AccesoCarpetas(DIR *dir, int n, int m, int j, int *arregloDirectorios, int *arregloTextos, int argc, char *cadena, int fd[], char *superbuffer) {
 
@@ -92,6 +93,13 @@ int AccesoCarpetas(DIR *dir, int n, int m, int j, int *arregloDirectorios, int *
 
 	char *texto, *nombre, *directorioPrin;	
 	DIR *dir2;
+
+/*	while ( (direntd = readdir(dir) ) != NULL) {
+ 	  	printf("%d\t%d\t%d\t%s\n", direntd->d_ino, direntd->d_off, direntd->d_reclen, direntd->d_name);
+ 	}*/
+/*
+	if (strcmp(direntd->d_name, texto) == 0)
+		printf("HOLAAAAAAAAAAAAAA%s\n", direntd->d_name);*/
 
 	texto = (char *)malloc(sizeof(char)*TAM);
 	nombre = (char *)malloc(sizeof(char)*TAM);
@@ -159,6 +167,9 @@ int AccesoCarpetas(DIR *dir, int n, int m, int j, int *arregloDirectorios, int *
  * los archivos a los que accesará cada uno de los procesos hijos
  * nombre: string que guarda la ruta donde estan las carpetas desde el 
  * directorio principal
+ * fd: pipe para comunicacion de procesos
+ * superbuffer: buffer para guardar los archivos de un hijo
+ * retorna contador de archivos que procesó
  */
 int AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre, int fd[], char *superbuffer) {
 	
@@ -185,14 +196,12 @@ int AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre, int fd[],
 
 		if (stat(directorioActual, &bstat2) != 0) {
 			perror(" No se pudo obtener la informacion del archivo ");
-			exit(-1);	
 		}
 
 		else if (S_ISREG(bstat2.st_mode)) {
 
 			printf(" Es un archivo regular\n");
 			contArchivosProc++;
-			printf("CONTADOR %d\n", contArchivosProc);
 
 			char *buffer;
 			buffer = (char *)malloc(sizeof(char)*TAM2);
@@ -221,9 +230,9 @@ int AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre, int fd[],
 
 /* EscribirPipes
 * Procedimiento donde los procesos hijos escriben en los pipes.
-* fd: arreglo de pipes
-* directorioActual: ruta principal junto a la carpeta correspondiente y archivo
-* correspondiente
+* fd: pipe para la comunicación de procesos
+* superbuffer: buffer donde se guardarán los archivos correspondientes 
+* a un hijo
 */
 void EscribirPipes(int fd[], char *superbuffer) {
 
@@ -259,8 +268,6 @@ void LeerPipes(int fd[], char *salida) {
 * Procedimiento donde los procesos hijos leen de los archivos de texto.
 * directorioActual: directorio dessde donde los procesos hijos van a leer sus
 * respectivos archivos de texto
-* buffer: guardará en un buffer lo que un proceso hijo leyó de un archivo de 
-* texto
 * retorna un buffer 
 */
 char *LeerArchivo(char *directorioActual) {
@@ -294,6 +301,8 @@ char *LeerArchivo(char *directorioActual) {
 * final de texto.
 * salida: archivo donde se encuentra todo el archivo final creado por el proceso
 * padre
+* bufferRead: buffer que guardará todos los textos de todos los archivos
+* leídos
 */
 void EscribirArchivo(char *salida, char *bufferRead) {
 

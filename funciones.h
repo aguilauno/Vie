@@ -24,7 +24,7 @@
 
 /* Constantes */
 #define TAM   200 /* Valor arbitrario para definir un tamaño para strings */
-#define TAM2  1048576 
+#define TAM2  1048576 /* Valor arbitrario para definir un tamaño para buffers */
 #define MAX_N 10  /* Valor máximo para el rango del número aleatorio n */
 #define MAX_M 20  /* Valor máximo para el rango del número aleatorio m */
 
