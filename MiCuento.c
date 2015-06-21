@@ -67,9 +67,6 @@ int main(int argc, char *argv[]) {
 
   		pipe(fd);
 
-  		char *superbuffer;
- 		superbuffer = (char *)malloc(sizeof(char)*TAM2+64);
-
  		int contArchivosProc;
 
   		/* Crear n procesos hijos y cada uno toma control de la carpeta que le 
@@ -85,14 +82,17 @@ int main(int argc, char *argv[]) {
 
 				/* Luego cada proceso hijo genera m números aleatorios [1..20] para
 				 * seleccionar de sus textos cuales va a usar en el cuento */
+		    	char *superbuffer;
+ 				superbuffer = (char *)malloc(sizeof(char)*TAM2);
+
 		    	int *arregloTextos;
 		    	arregloTextos = secuenciaRandom(m, MAX_M, getpid());
-		    	//printf("Soy el hijo con pid %d, iteracion:%d\n", getpid(), j);
 
 		    	contArchivosProc = AccesoCarpetas(dir, n, m, j, arregloDirectorios, arregloTextos, argc, cadena, fd, superbuffer);
 
-		    	if (j != n-1)
+		    	if (j != n-1) {
 					strcat(superbuffer, "\n\n");
+				}
 		    	
 		    	EscribirPipes(fd, superbuffer);
 		    	close(fd[1]); /* Cerramos la escritura del pipe */
@@ -103,9 +103,6 @@ int main(int argc, char *argv[]) {
 
 		    	exit(contArchivosProc);
 			}
-/*			else {
-				printf("Soy el Padre con ID= %ld, mi hijo es %ld\n",(long)getpid(),hijos[j]);
-			}*/
   		}
 
   		/* Ciclo que espera por los procesos hijos */
@@ -116,6 +113,7 @@ int main(int argc, char *argv[]) {
 
 		LeerPipes(fd, salida);
 		close(fd[0]); /* Cerramos la lectura del pipe */
+		closedir(dir);
 	}		
 
 	else if (argc > 6 || argc < 4) { /* Cuando no se indican los parámetros necesarios */
@@ -123,8 +121,6 @@ int main(int argc, char *argv[]) {
 		printf(" Error, no se indican los parámetros necesarios. \n");
     	exit(1);
 	}
-
-	closedir(dir);
 
 	return 0;
 } 
