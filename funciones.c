@@ -64,7 +64,6 @@ int *secuenciaRandom(int tamSecuencia, int randMax, int pidHijo) {
 /* AccesoCarpetas
 * Accede a las carpetas correspondientes para hacer la verificación de si son 
 * directorios o no.
-* dir: directorio en el que se hará acceso para lectura de carpetas y archivos
 * n: cantidad de elementos a recorrer en el arregloDirectorios
 * m: cantidad de elementos a recorrer en el arregloTextos
 * j: iteracion en la que se encuentra el proceso hijo
@@ -79,31 +78,19 @@ int *secuenciaRandom(int tamSecuencia, int randMax, int pidHijo) {
 * a un hijo
 * retorna el contador de archivos que procesó
 */ 
-int AccesoCarpetas(DIR *dir, int n, int m, int j, int *arregloDirectorios, int *arregloTextos, int argc, char *cadena, int fd[], char *superbuffer) {
+int AccesoCarpetas(int n, int m, int j, int *arregloDirectorios, int *arregloTextos, int argc, char *cadena, int fd[], char *superbuffer) {
 
 	struct stat bstat; 		
-	struct dirent *direntd;
-	struct dirent *direntd2;
-	direntd = readdir(dir);
 
-	int tam, rpta, contArchivosProc;
-	tam = (unsigned) strlen(dir);
+	int rpta, contArchivosProc, f_d = 0;
 
 	rpta = *(arregloDirectorios + j);
 
 	char *texto, *nombre, *directorioPrin;	
-	DIR *dir2;
-
-/*	while ( (direntd = readdir(dir) ) != NULL) {
- 	  	printf("%d\t%d\t%d\t%s\n", direntd->d_ino, direntd->d_off, direntd->d_reclen, direntd->d_name);
- 	}*/
-/*
-	if (strcmp(direntd->d_name, texto) == 0)
-		printf("HOLAAAAAAAAAAAAAA%s\n", direntd->d_name);*/
 
 	texto = (char *)malloc(sizeof(char)*TAM);
 	nombre = (char *)malloc(sizeof(char)*TAM);
-	directorioPrin = (char *)malloc(sizeof(char)*tam);
+	directorioPrin = (char *)malloc(sizeof(char)*TAM);
 
 	sprintf(texto, "%d", rpta);
 
@@ -112,8 +99,7 @@ int AccesoCarpetas(DIR *dir, int n, int m, int j, int *arregloDirectorios, int *
 		strcpy(nombre, directorioPrin);
 		strcat(nombre, "/");
 		strcat(nombre, texto);
-		strcat(nombre,"\0");
-		//printf("%s\n", nombre);	
+		strcat(nombre,"\0");	
 	}
 	else if (argc == 4) {
 		getcwd(directorioPrin, TAM);
@@ -121,39 +107,46 @@ int AccesoCarpetas(DIR *dir, int n, int m, int j, int *arregloDirectorios, int *
 		strcat(nombre, "/");
 		strcat(nombre, texto);
 		strcat(nombre,"\0");
-		//printf("%s\n", nombre);
 	}
+	printf("\n%s", nombre);
 
-	if (stat(nombre, &bstat) != 0) {
-		perror(" No se pudo obtener la informacion de la carpeta ");
-    	exit(-1);	
-	}
-	else if (S_ISDIR(bstat.st_mode)) {
-		printf(" Es un directorio\n\n");
-	}
+	/* Abrimos el posible directorio */
+	f_d = open(nombre, O_RDONLY);
 
-	else {
-		printf(" No es un directorio \n");
+ 
+    /* Verificamos si fue exitoso open() */
+    if (-1 == f_d) 
+    { 
+        perror("\n No se puede obtener informacion de la carpeta\n"); 
+        exit(-1); 
+    } 
+ 
+    /* Colocamos el errno por defecto */
+    errno = 0; 
+
+    if(fstat(f_d, &bstat)) 
+    { 
+        printf("\nfstat error: [%s]\n",strerror(errno)); 
+        close(f_d); 
+        exit(-1); 
+    } 
+ 
+	if(S_ISDIR(bstat.st_mode)) 
+    { 
+        printf("\n Es un directorio\n"); 
+    } 
+    else {
+		printf("\n No es un directorio \n");
 		exit(-1);
 	}
 
-	if ( (dir2 = opendir(texto)) == NULL) {
+    close(f_d); 
 
-		perror(" No se puede abrir el directorio ya que no existe ");
-		exit(1);
-	}
-	else {
-		//printf(" El directorio actual es %s\n", texto);
-	}
-
-	direntd2 = readdir(dir2);
-
-	contArchivosProc = AccesoArchivos(dir2, m, arregloTextos, nombre, fd, superbuffer);
+	contArchivosProc = AccesoArchivos(m, arregloTextos, nombre, fd, superbuffer);
 
 	free(directorioPrin);
 	free(texto);
 	free(nombre);
-	closedir(dir2);
 
 	return(contArchivosProc);
 }
@@ -161,7 +154,6 @@ int AccesoCarpetas(DIR *dir, int n, int m, int j, int *arregloDirectorios, int *
 /* AccesoArchivos
  * Accede a los archivos correspondientes para la verificación de si son 
  * archivos regulares o no
- * dir2: directorio donde ya se accede a las carpetas existentes del 1 al 10
  * m: cantidad de elementos a recorrer en el arregloTextos
  * arregloTextos: arreglo que contiene cada uno de los números que representan
  * los archivos a los que accesará cada uno de los procesos hijos
@@ -171,12 +163,10 @@ int AccesoCarpetas(DIR *dir, int n, int m, int j, int *arregloDirectorios, int *
  * superbuffer: buffer para guardar los archivos de un hijo
  * retorna contador de archivos que procesó
  */
-int AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre, int fd[], char *superbuffer) {
+int AccesoArchivos(int m, int *arregloTextos, char *nombre, int fd[], char *superbuffer) {
 	
-	int i,rpta,tam2, contArchivosProc;
-	struct stat bstat2; 		
+	int i,rpta,tam2, contArchivosProc;		
 	char *texto, *directorioActual;
-	tam2 = (unsigned) strlen(dir2);
 
 	contArchivosProc = 0;
 
@@ -192,16 +182,33 @@ int AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre, int fd[],
 		strcat(directorioActual, "/");
 		strcat(directorioActual, texto);
 		strcat(directorioActual,"\0");
-		printf("\n%s\n", directorioActual);
+		printf("\n%s", directorioActual);
 
-		if (stat(directorioActual, &bstat2) != 0) {
-			perror(" No se pudo obtener la informacion del archivo ");
-		}
+		int f_d = 0;
+		struct stat bstat2; 
 
-		else if (S_ISREG(bstat2.st_mode)) {
+		/* Abrimos el posible archivo regular */
+		f_d = open(directorioActual, O_RDONLY);
 
-			printf(" Es un archivo regular\n");
-			contArchivosProc++;
+	 
+	    /* Verificamos si fue exitoso open() */
+	    if (-1 == f_d) 
+	    { 
+	        perror("\n No se puede obtener informacion del archivo\n"); 
+	    } 
+	 
+	    /* Colocamos el errno por defecto */
+	    errno = 0; 
+
+	    if(fstat(f_d, &bstat2)) 
+	    { 
+	        printf("\nfstat error: [%s]\n",strerror(errno)); 
+	    } 
+	 
+		if(S_ISREG(bstat2.st_mode)) 
+	    { 
+	        printf("\n Es un archivo regular\n"); 
+	        contArchivosProc++;
 
 			char *buffer;
 			buffer = (char *)malloc(sizeof(char)*TAM2);
@@ -214,12 +221,12 @@ int AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre, int fd[],
 				strcat(superbuffer, "\n\n");
 
    			free(buffer);
+	    } 
+	    else {
+			printf("\n No es un archivo regular\n");
 		}
 
-		else {
-			printf(" No es un archivo regular\n");
-			exit(-1);
-		}
+	    close(f_d); 
 
 		free(texto);
 		free(directorioActual);
@@ -251,13 +258,9 @@ void LeerPipes(int fd[], char *salida) {
 	close(fd[1]); /* Cerramos la escritura del pipe */
 
 	char *bufferRead;
-	int countbytes;
 				
 	bufferRead = (char *)malloc(sizeof(char)*TAM2);
-    countbytes = read(fd[0], bufferRead, sizeof(bufferRead)*TAM2);
-
-    printf("%s\n", bufferRead);
-    printf("\nentro en leerPipes con %d\n", countbytes);
+    read(fd[0], bufferRead, sizeof(bufferRead)*TAM2);
 
     EscribirArchivo(salida, bufferRead);
 
@@ -307,7 +310,7 @@ char *LeerArchivo(char *directorioActual) {
 void EscribirArchivo(char *salida, char *bufferRead) {
 
 	FILE *fp;
-	fp = fopen(salida,"w");
+	fp = fopen(salida, "w");
 
 	fprintf(fp, bufferRead);
 

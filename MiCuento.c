@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
 		    	int *arregloTextos;
 		    	arregloTextos = secuenciaRandom(m, MAX_M, getpid());
 
-		    	contArchivosProc = AccesoCarpetas(dir, n, m, j, arregloDirectorios, arregloTextos, argc, cadena, fd, superbuffer);
+		    	contArchivosProc = AccesoCarpetas(n, m, j, arregloDirectorios, arregloTextos, argc, cadena, fd, superbuffer);
 
 		    	if (j != n-1) {
 					strcat(superbuffer, "\n\n");
@@ -98,8 +98,6 @@ int main(int argc, char *argv[]) {
 		    	close(fd[1]); /* Cerramos la escritura del pipe */
 
 		    	free(superbuffer);
-
-		    	printf("CONTADOR DEL EXIT %d\n", contArchivosProc);
 
 		    	exit(contArchivosProc);
 			}
@@ -116,7 +114,7 @@ int main(int argc, char *argv[]) {
 		closedir(dir);
 	}		
 
-	else if (argc > 6 || argc < 4) { /* Cuando no se indican los parámetros necesarios */
+	else { /* Cuando no se indican los parámetros necesarios */
 
 		printf(" Error, no se indican los parámetros necesarios. \n");
     	exit(1);

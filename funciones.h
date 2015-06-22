@@ -9,16 +9,16 @@
  */
 
 /* Librerías utilizadas */
-#include <errno.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/dir.h>
+#include <unistd.h>
 #include <dirent.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/dir.h>
+#include <fcntl.h>
 #include <time.h>
 #include <assert.h>
 
@@ -35,9 +35,9 @@ int cmpfunc(const void *a, const void *b);
 /* Genera el apuntador a un arreglo de números aleatorios */
 int *secuenciaRandom(int tamSecuencia, int randMax, int pidHijo);
 /* Procedimiento para acceder a las carpetas necesarias */
-int AccesoCarpetas(DIR *dir, int n, int m, int j, int *arregloDirectorios, int *arregloTextos, int argc, char *cadena, int fd[], char *superbuffer);
+int AccesoCarpetas(int n, int m, int j, int *arregloDirectorios, int *arregloTextos, int argc, char *cadena, int fd[], char *superbuffer);
 /* Procedimiento para acceder a los archivos necesarios */
-int AccesoArchivos(DIR *dir2, int m, int *arregloTextos, char *nombre, int fd[], char *superbuffer);
+int AccesoArchivos(int m, int *arregloTextos, char *nombre, int fd[], char *superbuffer);
 /* Procedimiento para que el proceso padre lea de los pipes */
 void LeerPipes(int fd[], char *salida);
 /* Procedimiento para que los procesos hijos escriban en los pipes */
