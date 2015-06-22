@@ -118,7 +118,8 @@ int AccesoCarpetas(int n, int m, int j, int *arregloDirectorios, int *arregloTex
     if (-1 == f_d) 
     { 
         perror("\n No se puede obtener informacion de la carpeta\n"); 
-        exit(-1); 
+        printf(" Este proceso hijo no tiene carpeta asignada\n");
+        exit(0); 
     } 
  
     /* Colocamos el errno por defecto */
@@ -127,8 +128,9 @@ int AccesoCarpetas(int n, int m, int j, int *arregloDirectorios, int *arregloTex
     if(fstat(f_d, &bstat)) 
     { 
         printf("\nfstat error: [%s]\n",strerror(errno)); 
+        printf(" Este proceso hijo no tiene carpeta asignada\n");
         close(f_d); 
-        exit(-1); 
+        exit(0); 
     } 
  
 	if(S_ISDIR(bstat.st_mode)) 
@@ -137,7 +139,8 @@ int AccesoCarpetas(int n, int m, int j, int *arregloDirectorios, int *arregloTex
     } 
     else {
 		printf("\n No es un directorio \n");
-		exit(-1);
+		printf(" Este proceso hijo no tiene carpeta asignada\n");
+		exit(0);
 	}
 
     close(f_d); 
